@@ -157,13 +157,17 @@ local fxGui = new("ScreenGui", { Name = "PremiumFlyFx", ResetOnSpawn = false, Ig
 SoundHost = game:GetService("SoundService")
 local vp = gui.AbsoluteSize
 if vp.X < 10 then vp = Vector2.new(800, 600) end
-local uiScale = math.clamp(vp.Y / 560, 0.62, 1)
 local W, H = 300, 420
+local uiScale = math.clamp((vp.Y - 120) / H, 0.5, 1)
+local TOPOFF = 26 -- keeps the panel clear of the Roblox top bar
 
-local root = new("CanvasGroup", { Name = "Panel", AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 16, 0.5, 0), Size = UDim2.fromOffset(W, H), BackgroundColor3 = C3(8, 8, 12), GroupTransparency = 1, BorderSizePixel = 0 }, gui)
+local root = new("CanvasGroup", { Name = "Panel", AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 16, 0.5, TOPOFF), Size = UDim2.fromOffset(W, H), BackgroundTransparency = 1, GroupTransparency = 1, BorderSizePixel = 0 }, gui)
 corner(root, 20)
 new("UIScale", { Scale = uiScale }, root)
-new("UIGradient", { Rotation = 90, Color = ColorSequence.new(C3(20, 20, 28), C3(5, 5, 8)) }, root)
+-- background lives in its own frame: a UIGradient on a CanvasGroup would tint every child black
+local rootBg = new("Frame", { Name = "Bg", Size = UDim2.fromScale(1, 1), BackgroundColor3 = WHITE, BorderSizePixel = 0, ZIndex = 0 }, root)
+corner(rootBg, 20)
+new("UIGradient", { Rotation = 90, Color = ColorSequence.new(C3(22, 22, 30), C3(7, 7, 11)) }, rootBg)
 local rootStroke = stroke(root, 1.8, WHITE, 0)
 local rootGrad = new("UIGradient", {}, rootStroke)
 onAccent(function(c) rootGrad.Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, c), ColorSequenceKeypoint.new(0.25, shineOf(c)), ColorSequenceKeypoint.new(0.5, darkOf(c)), ColorSequenceKeypoint.new(0.75, shineOf(c)), ColorSequenceKeypoint.new(1, c) }) end)
@@ -839,11 +843,11 @@ paintPresets(true)
 paintModes(true)
 play("on", 0.4)
 -- open animation
-root.Position = UDim2.new(0, 16, 0.5, 40)
+root.Position = UDim2.new(0, 16, 0.5, TOPOFF + 40)
 local rs = root:FindFirstChildOfClass("UIScale")
 local target = rs.Scale
 rs.Scale = target * 0.88
-tw(root, 0.6, { Position = UDim2.new(0, 16, 0.5, 0), GroupTransparency = 0 })
+tw(root, 0.6, { Position = UDim2.new(0, 16, 0.5, TOPOFF), GroupTransparency = 0 })
 tw(rs, 0.6, { Scale = target }, Enum.EasingStyle.Back)
 for i, o in ipairs({ stSpeed.Parent, stAlt.Parent, stState.Parent }) do
 	o.BackgroundTransparency = 1
